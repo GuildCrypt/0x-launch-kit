@@ -20,5 +20,17 @@ export async function initDBConnectionAsync(): Promise<void> {
     if (!_.isUndefined(connectionIfExists)) {
         throw new Error('DB connection already exists');
     }
-    connectionIfExists = await createConnection();
+    connectionIfExists = await createConnection({
+      url: process.env.DATABASE_URL,
+      type: 'postgres',
+      synchronize: true,
+      logging: true,
+      entities: ["ts/lib/entity/**/*.js", "js/entity/**/*.js"],
+      cli: {
+          "entitiesDir": "ts/lib/entity"
+      },
+      extra: {
+        ssl: true,
+      }
+    });
 }
