@@ -16,35 +16,20 @@ enum EnvVarType {
     Url,
 }
 // Whitelisted token addresses. Set to a '*' instead of an array to allow all tokens.
-export const WHITELISTED_TOKENS: string[] | '*' = [
-    '0x2002d3812f58e35f0ea1ffbf80a75a38c32175fa', // ZRX on Kovan
-    '0xd0a1e359811322d97991e03f863a0c30c2cf029c', // WETH on Kovan
-];
+export const WHITELISTED_TOKENS: string[] | '*' = getWhitelistedTokens();
 
 // Network port to listen on
-export const HTTP_PORT = _.isEmpty(process.env.HTTP_PORT)
-    ? 3000
-    : assertEnvVarType('HTTP_PORT', process.env.HTTP_PORT, EnvVarType.Port);
+export const HTTP_PORT = getHttpPort();
 // Default network id to use when not specified
-export const NETWORK_ID = _.isEmpty(process.env.NETWORK_ID)
-    ? 42
-    : assertEnvVarType('NETWORK_ID', process.env.NETWORK_ID, EnvVarType.NetworkId);
+export const NETWORK_ID = getNetworkId();
 // The fee recipient for orders
-export const FEE_RECIPIENT = _.isEmpty(process.env.FEE_RECIPIENT)
-    ? getDefaultFeeRecipient()
-    : assertEnvVarType('FEE_RECIPIENT', process.env.FEE_RECIPIENT, EnvVarType.FeeRecipient);
+export const FEE_RECIPIENT = getFeeRecipient();
 // A flat fee in ZRX that should be charged to the order maker
-export const MAKER_FEE_ZRX_UNIT_AMOUNT = _.isEmpty(process.env.MAKER_FEE_ZRX_UNIT_AMOUNT)
-    ? new BigNumber(0)
-    : assertEnvVarType('MAKER_FEE_ZRX_UNIT_AMOUNT', process.env.MAKER_FEE_ZRX_UNIT_AMOUNT, EnvVarType.UnitAmount);
+export const MAKER_FEE_ZRX_UNIT_AMOUNT = getMakerFeeZrxUnitAmount();
 // A flat fee in ZRX that should be charged to the order taker
-export const TAKER_FEE_ZRX_UNIT_AMOUNT = _.isEmpty(process.env.TAKER_FEE_ZRX_UNIT_AMOUNT)
-    ? new BigNumber(0)
-    : assertEnvVarType('TAKER_FEE_ZRX_UNIT_AMOUNT', process.env.TAKER_FEE_ZRX_UNIT_AMOUNT, EnvVarType.UnitAmount);
+export const TAKER_FEE_ZRX_UNIT_AMOUNT = getTakerFeeZrxUnitAmount();
 // Ethereum RPC url
-export const RPC_URL = _.isEmpty(process.env.RPC_URL)
-    ? 'https://kovan.infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa'
-    : assertEnvVarType('RPC_URL', process.env.RPC_URL, EnvVarType.Url);
+export const RPC_URL = getRpcUrl();
 
 // A time window after which the order is considered permanently expired
 export const ORDER_SHADOWING_MARGIN_MS = 100 * 1000; // tslint:disable-line custom-no-magic-numbers
@@ -54,6 +39,49 @@ export const PERMANENT_CLEANUP_INTERVAL_MS = 10 * 1000; // tslint:disable-line c
 export const MAX_PER_PAGE = 1000;
 // Default ERC20 token precision
 export const DEFAULT_ERC20_TOKEN_PRECISION = 18;
+
+function getWhitelistedTokens(): string[] | '*' {
+  return [
+      '0x2002d3812f58e35f0ea1ffbf80a75a38c32175fa', // ZRX on Kovan
+      '0xd0a1e359811322d97991e03f863a0c30c2cf029c', // WETH on Kovan
+  ];
+}
+
+function getHttpPort(): number {
+  return _.isEmpty(process.env.HTTP_PORT)
+      ? 3000
+      : assertEnvVarType('HTTP_PORT', process.env.HTTP_PORT, EnvVarType.Port);
+}
+
+function getNetworkId(): number {
+  return _.isEmpty(process.env.NETWORK_ID)
+      ? 42
+      : assertEnvVarType('NETWORK_ID', process.env.NETWORK_ID, EnvVarType.NetworkId);
+}
+
+function getFeeRecipient(): string {
+  return _.isEmpty(process.env.FEE_RECIPIENT)
+      ? getDefaultFeeRecipient()
+      : assertEnvVarType('FEE_RECIPIENT', process.env.FEE_RECIPIENT, EnvVarType.FeeRecipient);
+}
+
+function getMakerFeeZrxUnitAmount(): BigNumber {
+  return _.isEmpty(process.env.MAKER_FEE_ZRX_UNIT_AMOUNT)
+      ? new BigNumber(0)
+      : assertEnvVarType('MAKER_FEE_ZRX_UNIT_AMOUNT', process.env.MAKER_FEE_ZRX_UNIT_AMOUNT, EnvVarType.UnitAmount);
+}
+
+function getTakerFeeZrxUnitAmount(): BigNumber {
+  return _.isEmpty(process.env.TAKER_FEE_ZRX_UNIT_AMOUNT)
+      ? new BigNumber(0)
+      : assertEnvVarType('TAKER_FEE_ZRX_UNIT_AMOUNT', process.env.TAKER_FEE_ZRX_UNIT_AMOUNT, EnvVarType.UnitAmount);
+}
+
+function getRpcUrl(): string {
+  return _.isEmpty(process.env.RPC_URL)
+      ? 'https://kovan.infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa'
+      : assertEnvVarType('RPC_URL', process.env.RPC_URL, EnvVarType.Url)
+}
 
 function assertEnvVarType(name: string, value: any, expectedType: EnvVarType): any {
     let returnValue;
