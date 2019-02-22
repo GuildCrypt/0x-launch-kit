@@ -15,7 +15,7 @@
         "prettier:ts": "prettier --write 'ts/**/*.ts' --config .prettierrc",
         "start:ts": "node -r dotenv/config ts/lib/index.js",
         "lint:ts": "tslint --project ts --format stylish",
-        "push:heroku": "git push heroku heroku:master"
+        "push:heroku": "yarn build && git push heroku heroku:master"
     },
     "devDependencies": {
         "@0x/tslint-config": "^3.0.0",
