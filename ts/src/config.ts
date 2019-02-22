@@ -48,9 +48,13 @@ function getWhitelistedTokens(): string[] | '*' {
 }
 
 function getHttpPort(): number {
-  return _.isEmpty(process.env.HTTP_PORT)
-      ? 3000
-      : assertEnvVarType('HTTP_PORT', process.env.HTTP_PORT, EnvVarType.Port);
+  if (!_.isEmpty(process.env.HTTP_PORT)) {
+    return assertEnvVarType('HTTP_PORT', process.env.HTTP_PORT, EnvVarType.Port);
+  }
+  if (!_.isEmpty(process.env.PORT)) {
+    return assertEnvVarType('HTTP_PORT', process.env.PORT, EnvVarType.Port);
+  }
+  return 3000
 }
 
 function getNetworkId(): number {
