@@ -1,0 +1,12 @@
+{
+  "name": "Bookzaar",
+  "website": "https://guildcrypt.com/",
+  "repository": "https://github.com/bookzaar",
+  "success_url": "/v2/orders",
+  "image": "heroku/nodejs",
+  "addons": [
+    {
+      "plan": "heroku-postgresql"
+    }
+  ]
+}
