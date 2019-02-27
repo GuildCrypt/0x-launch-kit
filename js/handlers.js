@@ -5,6 +5,7 @@ const json_schemas_1 = require("@0x/json-schemas");
 const web3_wrapper_1 = require("@0x/web3-wrapper");
 const HttpStatus = require("http-status-codes");
 const _ = require("lodash");
+const geoip = require("geoip-lite");
 const config_1 = require("./config");
 const constants_1 = require("./constants");
 const errors_1 = require("./errors");
@@ -14,33 +15,36 @@ const utils_1 = require("./utils");
 const parsePaginationConfig = (req) => {
     const page = _.isUndefined(req.query.page) ? constants_1.DEFAULT_PAGE : Number(req.query.page);
     const perPage = _.isUndefined(req.query.perPage) ? constants_1.DEFAULT_PER_PAGE : Number(req.query.perPage);
-    if (perPage > config_1.MAX_PER_PAGE) {
+    if (perPage > config_1.default.maxPerPage) {
         throw new errors_1.ValidationError([
             {
                 field: 'perPage',
                 code: errors_1.ValidationErrorCodes.ValueOutOfRange,
-                reason: `perPage should be less or equal to ${config_1.MAX_PER_PAGE}`,
+                reason: `perPage should be less or equal to ${config_1.default.maxPerPage}`,
             },
         ]);
     }
     return { page, perPage };
 };
 class Handlers {
+    static config(_req, res) {
+        res.status(HttpStatus.OK).send(config_1.default);
+    }
     static feeRecipients(req, res) {
         const { page, perPage } = parsePaginationConfig(req);
-        const normalizedFeeRecipient = config_1.FEE_RECIPIENT.toLowerCase();
+        const normalizedFeeRecipient = config_1.default.feeRecipient.toLowerCase();
         const feeRecipients = [normalizedFeeRecipient];
         const paginatedFeeRecipients = paginator_1.paginate(feeRecipients, page, perPage);
         res.status(HttpStatus.OK).send(paginatedFeeRecipients);
     }
     static orderConfig(req, res) {
         utils_1.utils.validateSchema(req.body, json_schemas_1.schemas.orderConfigRequestSchema);
-        const normalizedFeeRecipient = config_1.FEE_RECIPIENT.toLowerCase();
+        const normalizedFeeRecipient = config_1.default.feeRecipient.toLowerCase();
         const orderConfigResponse = {
             senderAddress: constants_1.NULL_ADDRESS,
             feeRecipientAddress: normalizedFeeRecipient,
-            makerFee: web3_wrapper_1.Web3Wrapper.toBaseUnitAmount(config_1.MAKER_FEE_ZRX_UNIT_AMOUNT, constants_1.ZRX_DECIMALS).toString(),
-            takerFee: web3_wrapper_1.Web3Wrapper.toBaseUnitAmount(config_1.TAKER_FEE_ZRX_UNIT_AMOUNT, constants_1.ZRX_DECIMALS).toString(),
+            makerFee: web3_wrapper_1.Web3Wrapper.toBaseUnitAmount(config_1.default.makerFee, constants_1.ZRX_DECIMALS).toString(),
+            takerFee: web3_wrapper_1.Web3Wrapper.toBaseUnitAmount(config_1.default.takerFee, constants_1.ZRX_DECIMALS).toString(),
         };
         res.status(HttpStatus.OK).send(orderConfigResponse);
     }
@@ -82,8 +86,15 @@ class Handlers {
     async postOrderAsync(req, res) {
         utils_1.utils.validateSchema(req.body, json_schemas_1.schemas.signedOrderSchema);
         const signedOrder = unmarshallOrder(req.body);
-        if (config_1.WHITELISTED_TOKENS !== '*') {
-            const allowedTokens = config_1.WHITELISTED_TOKENS;
+        if (config_1.default.geos.type !== 'all') {
+            const ip = req.connection.remoteAddress;
+            const iso3166Code = geoip.lookup(ip).country;
+            if (!config_1.default.geos.includes(iso3166Code)) {
+                throw new errors_1.GeoBlockError(iso3166Code);
+            }
+        }
+        if (config_1.default.tokens.type === 'only') {
+            const allowedTokens = config_1.default.tokens.value || [];
             validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.makerAssetData, 'makerAssetData');
             validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.takerAssetData, 'takerAssetData');
         }

@@ -2,137 +2,49 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:custom-no-magic-numbers
 const _0x_js_1 = require("0x.js");
-const crypto = require("crypto");
-const fs = require("fs");
-const _ = require("lodash");
-const path = require("path");
-const assert_1 = require("@0x/assert");
-const metadataPath = path.join(__dirname, '../../metadata.json');
-var EnvVarType;
-(function (EnvVarType) {
-    EnvVarType[EnvVarType["Port"] = 0] = "Port";
-    EnvVarType[EnvVarType["NetworkId"] = 1] = "NetworkId";
-    EnvVarType[EnvVarType["FeeRecipient"] = 2] = "FeeRecipient";
-    EnvVarType[EnvVarType["UnitAmount"] = 3] = "UnitAmount";
-    EnvVarType[EnvVarType["Url"] = 4] = "Url";
-})(EnvVarType || (EnvVarType = {}));
-// Whitelisted token addresses. Set to a '*' instead of an array to allow all tokens.
-exports.WHITELISTED_TOKENS = getWhitelistedTokens();
-// Network port to listen on
-exports.HTTP_PORT = getHttpPort();
-// Default network id to use when not specified
-exports.NETWORK_ID = getNetworkId();
-// The fee recipient for orders
-exports.FEE_RECIPIENT = getFeeRecipient();
-// A flat fee in ZRX that should be charged to the order maker
-exports.MAKER_FEE_ZRX_UNIT_AMOUNT = getMakerFeeZrxUnitAmount();
-// A flat fee in ZRX that should be charged to the order taker
-exports.TAKER_FEE_ZRX_UNIT_AMOUNT = getTakerFeeZrxUnitAmount();
-// Ethereum RPC url
-exports.RPC_URL = getRpcUrl();
-// A time window after which the order is considered permanently expired
-exports.ORDER_SHADOWING_MARGIN_MS = 100 * 1000; // tslint:disable-line custom-no-magic-numbers
-// Frequency of checks for permanently expired orders
-exports.PERMANENT_CLEANUP_INTERVAL_MS = 10 * 1000; // tslint:disable-line custom-no-magic-numbers
-// Max number of entities per page
-exports.MAX_PER_PAGE = 1000;
-// Default ERC20 token precision
-exports.DEFAULT_ERC20_TOKEN_PRECISION = 18;
-function getWhitelistedTokens() {
-    return [
-        '0x2002d3812f58e35f0ea1ffbf80a75a38c32175fa',
-        '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
-    ];
-}
-function getHttpPort() {
-    if (!_.isEmpty(process.env.HTTP_PORT)) {
-        return assertEnvVarType('HTTP_PORT', process.env.HTTP_PORT, EnvVarType.Port);
+class Listable {
+    constructor() {
+        this.type = 'none';
     }
-    if (!_.isEmpty(process.env.PORT)) {
-        return assertEnvVarType('HTTP_PORT', process.env.PORT, EnvVarType.Port);
-    }
-    return 3000;
-}
-function getNetworkId() {
-    return _.isEmpty(process.env.NETWORK_ID)
-        ? 42
-        : assertEnvVarType('NETWORK_ID', process.env.NETWORK_ID, EnvVarType.NetworkId);
-}
-function getFeeRecipient() {
-    return _.isEmpty(process.env.FEE_RECIPIENT)
-        ? getDefaultFeeRecipient()
-        : assertEnvVarType('FEE_RECIPIENT', process.env.FEE_RECIPIENT, EnvVarType.FeeRecipient);
-}
-function getMakerFeeZrxUnitAmount() {
-    return _.isEmpty(process.env.MAKER_FEE_ZRX_UNIT_AMOUNT)
-        ? new _0x_js_1.BigNumber(0)
-        : assertEnvVarType('MAKER_FEE_ZRX_UNIT_AMOUNT', process.env.MAKER_FEE_ZRX_UNIT_AMOUNT, EnvVarType.UnitAmount);
-}
-function getTakerFeeZrxUnitAmount() {
-    return _.isEmpty(process.env.TAKER_FEE_ZRX_UNIT_AMOUNT)
-        ? new _0x_js_1.BigNumber(0)
-        : assertEnvVarType('TAKER_FEE_ZRX_UNIT_AMOUNT', process.env.TAKER_FEE_ZRX_UNIT_AMOUNT, EnvVarType.UnitAmount);
-}
-function getRpcUrl() {
-    return _.isEmpty(process.env.RPC_URL)
-        ? 'https://kovan.infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa'
-        : assertEnvVarType('RPC_URL', process.env.RPC_URL, EnvVarType.Url);
-}
-function assertEnvVarType(name, value, expectedType) {
-    let returnValue;
-    switch (expectedType) {
-        case EnvVarType.Port:
-            try {
-                returnValue = parseInt(value, 10);
-                const isWithinRange = returnValue >= 0 && returnValue <= 65535;
-                if (!isWithinRange) {
-                    throw new Error();
-                }
-            }
-            catch (err) {
-                throw new Error(`${name} must be between 0 to 65535, found ${value}.`);
-            }
-            return returnValue;
-        case EnvVarType.NetworkId:
-            try {
-                returnValue = parseInt(value, 10);
-            }
-            catch (err) {
-                throw new Error(`${name} must be a valid integer, found ${value}.`);
-            }
-            return returnValue;
-        case EnvVarType.FeeRecipient:
-            assert_1.assert.isETHAddressHex(name, value);
-            return value;
-        case EnvVarType.Url:
-            assert_1.assert.isUri(name, value);
-            return value;
-        case EnvVarType.UnitAmount:
-            try {
-                returnValue = new _0x_js_1.BigNumber(parseFloat(value));
-                if (returnValue.isNegative) {
-                    throw new Error();
-                }
-            }
-            catch (err) {
-                throw new Error(`${name} must be valid number greater than 0.`);
-            }
-            return returnValue;
-        default:
-            throw new Error(`Unrecognised EnvVarType: ${expectedType} encountered for variable ${name}.`);
-    }
-}
-function getDefaultFeeRecipient() {
-    let newDefault = `0xabcabc${crypto.randomBytes(17).toString('hex')}`;
-    if (fs.existsSync(metadataPath)) {
-        const metadata = JSON.parse(fs.readFileSync(metadataPath).toString());
-        const existingDefault = metadata.DEFAULT_FEE_RECIPIENT;
-        newDefault = existingDefault || newDefault;
-        if (_.isEmpty(existingDefault)) {
-            const metadataCopy = JSON.parse(JSON.stringify(metadata));
-            metadataCopy.DEFAULT_FEE_RECIPIENT = newDefault;
-            fs.writeFileSync(metadataPath, JSON.stringify(metadataCopy));
+    includes(value) {
+        switch (this.type) {
+            case 'all':
+                return true;
+                break;
+            case 'none':
+                return false;
+                break;
+            case 'except':
+                return this.value ? !this.value.includes(value) : true;
+                break;
+            case 'only':
+                return this.value ? this.value.includes(value) : false;
+                break;
+            default:
+                return false;
+                break;
         }
     }
-    return newDefault;
 }
+class Config {
+    constructor(pojo) {
+        this.port = 5000;
+        this.networkId = 1;
+        this.rpcUrl = 'https://infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa';
+        this.feeRecipient = '0x0000000000000000000000000000000000000000';
+        this.makerFee = new _0x_js_1.BigNumber(0);
+        this.takerFee = new _0x_js_1.BigNumber(0);
+        this.tokens = new Listable;
+        this.geos = new Listable;
+        this.makers = new Listable;
+        this.orderShadowingMarginMs = 100 * 1000;
+        this.permanentCleanupIntervalMs = 100 * 1000;
+        this.maxPerPage = 1000;
+        this.defaultErc20Precision = 18;
+        if (process.env.PORT) {
+            this.port = parseInt(process.env.PORT);
+        }
+        Object.assign(this, pojo);
+    }
+}
+exports.default = new Config(JSON.parse(process.env.CONFIG_STRING_0));

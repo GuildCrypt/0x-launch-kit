@@ -39,7 +39,7 @@ class OrderBook {
             const asset = {
                 minAmount: new _0x_js_1.BigNumber(0),
                 maxAmount: constants_1.MAX_TOKEN_SUPPLY_POSSIBLE,
-                precision: config_1.DEFAULT_ERC20_TOKEN_PRECISION,
+                precision: config_1.default.defaultErc20Precision,
                 assetData,
             };
             return asset;
@@ -86,15 +86,15 @@ class OrderBook {
     }
     constructor() {
         const provider = new _0x_js_1.Web3ProviderEngine();
-        provider.addProvider(new _0x_js_1.RPCSubprovider(config_1.RPC_URL));
+        provider.addProvider(new _0x_js_1.RPCSubprovider(config_1.default.rpcUrl));
         provider.start();
         this._shadowedOrders = new Map();
         this._contractWrappers = new _0x_js_1.ContractWrappers(provider, {
-            networkId: config_1.NETWORK_ID,
+            networkId: config_1.default.networkId,
         });
-        this._orderWatcher = new order_watcher_1.OrderWatcher(provider, config_1.NETWORK_ID);
+        this._orderWatcher = new order_watcher_1.OrderWatcher(provider, config_1.default.networkId);
         this._orderWatcher.subscribe(this.onOrderStateChangeCallback.bind(this));
-        utils_1.intervalUtils.setAsyncExcludingInterval(this.onCleanUpInvalidOrdersAsync.bind(this), config_1.PERMANENT_CLEANUP_INTERVAL_MS, utils_2.utils.log);
+        utils_1.intervalUtils.setAsyncExcludingInterval(this.onCleanUpInvalidOrdersAsync.bind(this), config_1.default.permanentCleanupIntervalMs, utils_2.utils.log);
     }
     onOrderStateChangeCallback(err, orderState) {
         if (!_.isNull(err)) {
@@ -114,7 +114,7 @@ class OrderBook {
         const permanentlyExpiredOrders = [];
         for (const [orderHash, shadowedAt] of this._shadowedOrders) {
             const now = Date.now();
-            if (shadowedAt + config_1.ORDER_SHADOWING_MARGIN_MS < now) {
+            if (shadowedAt + config_1.default.orderShadowingMarginMs < now) {
                 permanentlyExpiredOrders.push(orderHash);
                 this._shadowedOrders.delete(orderHash); // we need to remove this order so we don't keep shadowing it
                 this._orderWatcher.removeOrder(orderHash); // also remove from order watcher to avoid more callbacks

@@ -13,13 +13,8 @@ import { Asset, AssetPairsItem, AssetProxyId, OrdersRequestOpts } from '@0x/type
 import { errorUtils, intervalUtils } from '@0x/utils';
 import * as _ from 'lodash';
 
-import {
-    DEFAULT_ERC20_TOKEN_PRECISION,
-    NETWORK_ID,
-    ORDER_SHADOWING_MARGIN_MS,
-    PERMANENT_CLEANUP_INTERVAL_MS,
-    RPC_URL,
-} from './config';
+import config from './config'
+
 import { MAX_TOKEN_SUPPLY_POSSIBLE } from './constants';
 
 import { getDBConnection } from './db_connection';
@@ -65,7 +60,7 @@ export class OrderBook {
             const asset: Asset = {
                 minAmount: new BigNumber(0),
                 maxAmount: MAX_TOKEN_SUPPLY_POSSIBLE,
-                precision: DEFAULT_ERC20_TOKEN_PRECISION,
+                precision: config.defaultErc20Precision,
                 assetData,
             };
             return asset;
@@ -112,18 +107,18 @@ export class OrderBook {
     }
     constructor() {
         const provider = new Web3ProviderEngine();
-        provider.addProvider(new RPCSubprovider(RPC_URL));
+        provider.addProvider(new RPCSubprovider(config.rpcUrl));
         provider.start();
 
         this._shadowedOrders = new Map();
         this._contractWrappers = new ContractWrappers(provider, {
-            networkId: NETWORK_ID,
+            networkId: config.networkId,
         });
-        this._orderWatcher = new OrderWatcher(provider, NETWORK_ID);
+        this._orderWatcher = new OrderWatcher(provider, config.networkId);
         this._orderWatcher.subscribe(this.onOrderStateChangeCallback.bind(this));
         intervalUtils.setAsyncExcludingInterval(
             this.onCleanUpInvalidOrdersAsync.bind(this),
-            PERMANENT_CLEANUP_INTERVAL_MS,
+            config.permanentCleanupIntervalMs,
             utils.log,
         );
     }
@@ -143,7 +138,7 @@ export class OrderBook {
         const permanentlyExpiredOrders: string[] = [];
         for (const [orderHash, shadowedAt] of this._shadowedOrders) {
             const now = Date.now();
-            if (shadowedAt + ORDER_SHADOWING_MARGIN_MS < now) {
+            if (shadowedAt + config.orderShadowingMarginMs < now) {
                 permanentlyExpiredOrders.push(orderHash);
                 this._shadowedOrders.delete(orderHash); // we need to remove this order so we don't keep shadowing it
                 this._orderWatcher.removeOrder(orderHash); // also remove from order watcher to avoid more callbacks

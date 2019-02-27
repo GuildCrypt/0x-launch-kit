@@ -32,6 +32,10 @@ export class NotFoundError extends RelayerBaseError {
     public statusCode = 404;
 }
 
+export class GeoBlockError extends RelayerBaseError {
+    public statusCode = 403;
+}
+
 export class TooManyRequestsError extends RelayerBaseError {
     public statusCode = 429;
     public generalErrorCode = GeneralErrorCodes.Throttled;

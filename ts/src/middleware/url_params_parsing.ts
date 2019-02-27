@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as _ from 'lodash';
 
-import { NETWORK_ID } from '../config';
+import config from '../config';
 import { ValidationError } from '../errors';
 
 /**
@@ -16,10 +16,10 @@ export function urlParamsParsing(req: express.Request, _res: express.Response, n
 
 function parseNetworkId(networkIdStrIfExists?: string): number {
     if (_.isUndefined(networkIdStrIfExists)) {
-        return NETWORK_ID;
+        return config.networkId;
     } else {
         const networkId = _.parseInt(networkIdStrIfExists);
-        if (networkId !== NETWORK_ID) {
+        if (networkId !== config.networkId) {
             const validationErrorItem = {
                 field: 'networkId',
                 code: 1004,

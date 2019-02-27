@@ -4,16 +4,11 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import * as express from 'express';
 import * as HttpStatus from 'http-status-codes';
 import * as _ from 'lodash';
+import * as geoip from 'geoip-lite'
 
-import {
-    FEE_RECIPIENT,
-    MAKER_FEE_ZRX_UNIT_AMOUNT,
-    MAX_PER_PAGE,
-    TAKER_FEE_ZRX_UNIT_AMOUNT,
-    WHITELISTED_TOKENS,
-} from './config';
+import config from './config'
 import { DEFAULT_PAGE, DEFAULT_PER_PAGE, NULL_ADDRESS, ZRX_DECIMALS } from './constants';
-import { NotFoundError, ValidationError, ValidationErrorCodes } from './errors';
+import { NotFoundError, ValidationError, ValidationErrorCodes, GeoBlockError } from './errors';
 import { OrderBook } from './orderbook';
 import { paginate } from './paginator';
 import { utils } from './utils';
@@ -21,12 +16,12 @@ import { utils } from './utils';
 const parsePaginationConfig = (req: express.Request): { page: number; perPage: number } => {
     const page = _.isUndefined(req.query.page) ? DEFAULT_PAGE : Number(req.query.page);
     const perPage = _.isUndefined(req.query.perPage) ? DEFAULT_PER_PAGE : Number(req.query.perPage);
-    if (perPage > MAX_PER_PAGE) {
+    if (perPage > config.maxPerPage) {
         throw new ValidationError([
             {
                 field: 'perPage',
                 code: ValidationErrorCodes.ValueOutOfRange,
-                reason: `perPage should be less or equal to ${MAX_PER_PAGE}`,
+                reason: `perPage should be less or equal to ${config.maxPerPage}`,
             },
         ]);
     }
@@ -35,21 +30,24 @@ const parsePaginationConfig = (req: express.Request): { page: number; perPage: n
 
 export class Handlers {
     private readonly _orderBook: OrderBook;
+    public static config(_req: express.Request, res: express.Response): void {
+        res.status(HttpStatus.OK).send(config);
+    }
     public static feeRecipients(req: express.Request, res: express.Response): void {
         const { page, perPage } = parsePaginationConfig(req);
-        const normalizedFeeRecipient = FEE_RECIPIENT.toLowerCase();
+        const normalizedFeeRecipient = config.feeRecipient.toLowerCase();
         const feeRecipients = [normalizedFeeRecipient];
         const paginatedFeeRecipients = paginate(feeRecipients, page, perPage);
         res.status(HttpStatus.OK).send(paginatedFeeRecipients);
     }
     public static orderConfig(req: express.Request, res: express.Response): void {
         utils.validateSchema(req.body, schemas.orderConfigRequestSchema);
-        const normalizedFeeRecipient = FEE_RECIPIENT.toLowerCase();
+        const normalizedFeeRecipient = config.feeRecipient.toLowerCase();
         const orderConfigResponse = {
             senderAddress: NULL_ADDRESS,
             feeRecipientAddress: normalizedFeeRecipient,
-            makerFee: Web3Wrapper.toBaseUnitAmount(MAKER_FEE_ZRX_UNIT_AMOUNT, ZRX_DECIMALS).toString(),
-            takerFee: Web3Wrapper.toBaseUnitAmount(TAKER_FEE_ZRX_UNIT_AMOUNT, ZRX_DECIMALS).toString(),
+            makerFee: Web3Wrapper.toBaseUnitAmount(config.makerFee, ZRX_DECIMALS).toString(),
+            takerFee: Web3Wrapper.toBaseUnitAmount(config.takerFee, ZRX_DECIMALS).toString(),
         };
         res.status(HttpStatus.OK).send(orderConfigResponse);
     }
@@ -95,8 +93,15 @@ export class Handlers {
     public async postOrderAsync(req: express.Request, res: express.Response): Promise<void> {
         utils.validateSchema(req.body, schemas.signedOrderSchema);
         const signedOrder = unmarshallOrder(req.body);
-        if (WHITELISTED_TOKENS !== '*') {
-            const allowedTokens: string[] = WHITELISTED_TOKENS;
+        if (config.geos.type !== 'all') {
+          const ip = req.connection.remoteAddress!;
+          const iso3166Code = geoip.lookup(ip).country;
+          if (!config.geos.includes(iso3166Code)) {
+            throw new GeoBlockError(iso3166Code);
+          }
+        }
+        if (config.tokens.type === 'only') {
+            const allowedTokens: string[] = config.tokens.value || [];
             validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.makerAssetData, 'makerAssetData');
             validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.takerAssetData, 'takerAssetData');
         }

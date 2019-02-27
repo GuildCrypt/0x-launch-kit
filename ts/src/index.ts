@@ -5,7 +5,7 @@ import * as express from 'express';
 import * as asyncHandler from 'express-async-handler';
 import 'reflect-metadata';
 
-import * as config from './config';
+import config from './config';
 import { initDBConnectionAsync } from './db_connection';
 import { Handlers } from './handlers';
 import { errorHandler } from './middleware/error_handling';
@@ -20,6 +20,11 @@ import { utils } from './utils';
     app.use(cors());
     app.use(bodyParser.json());
     app.use(urlParamsParsing);
+
+    /**
+     * GET config
+     */
+    app.get('/config', asyncHandler(Handlers.config.bind(Handlers)))
 
     /**
      * GET AssetPairs endpoint retrieves a list of available asset pairs and the information required to trade them.
@@ -59,9 +64,9 @@ import { utils } from './utils';
 
     app.use(errorHandler);
 
-    app.listen(config.HTTP_PORT, () => {
+    app.listen(config.port, () => {
         utils.log(
-            `Standard relayer API (HTTP) listening on port ${config.HTTP_PORT}!\nConfig: ${JSON.stringify(
+            `Standard relayer API (HTTP) listening on port ${config.port}!\nConfig: ${JSON.stringify(
                 config,
                 null,
                 2,

@@ -37,6 +37,13 @@ class NotFoundError extends RelayerBaseError {
     }
 }
 exports.NotFoundError = NotFoundError;
+class GeoBlockError extends RelayerBaseError {
+    constructor() {
+        super(...arguments);
+        this.statusCode = 403;
+    }
+}
+exports.GeoBlockError = GeoBlockError;
 class TooManyRequestsError extends RelayerBaseError {
     constructor() {
         super(...arguments);

@@ -1,145 +1,54 @@
 // tslint:disable:custom-no-magic-numbers
 import { BigNumber } from '0x.js';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
 import * as _ from 'lodash';
-import * as path from 'path';
 
-import { assert } from '@0x/assert';
+class Listable {
+  type: string = 'none';
+  value?: string[];
 
-const metadataPath = path.join(__dirname, '../../metadata.json');
-enum EnvVarType {
-    Port,
-    NetworkId,
-    FeeRecipient,
-    UnitAmount,
-    Url,
-}
-// Whitelisted token addresses. Set to a '*' instead of an array to allow all tokens.
-export const WHITELISTED_TOKENS: string[] | '*' = getWhitelistedTokens();
-
-// Network port to listen on
-export const HTTP_PORT = getHttpPort();
-// Default network id to use when not specified
-export const NETWORK_ID = getNetworkId();
-// The fee recipient for orders
-export const FEE_RECIPIENT = getFeeRecipient();
-// A flat fee in ZRX that should be charged to the order maker
-export const MAKER_FEE_ZRX_UNIT_AMOUNT = getMakerFeeZrxUnitAmount();
-// A flat fee in ZRX that should be charged to the order taker
-export const TAKER_FEE_ZRX_UNIT_AMOUNT = getTakerFeeZrxUnitAmount();
-// Ethereum RPC url
-export const RPC_URL = getRpcUrl();
-
-// A time window after which the order is considered permanently expired
-export const ORDER_SHADOWING_MARGIN_MS = 100 * 1000; // tslint:disable-line custom-no-magic-numbers
-// Frequency of checks for permanently expired orders
-export const PERMANENT_CLEANUP_INTERVAL_MS = 10 * 1000; // tslint:disable-line custom-no-magic-numbers
-// Max number of entities per page
-export const MAX_PER_PAGE = 1000;
-// Default ERC20 token precision
-export const DEFAULT_ERC20_TOKEN_PRECISION = 18;
-
-function getWhitelistedTokens(): string[] | '*' {
-  return [
-      '0x2002d3812f58e35f0ea1ffbf80a75a38c32175fa', // ZRX on Kovan
-      '0xd0a1e359811322d97991e03f863a0c30c2cf029c', // WETH on Kovan
-  ];
-}
-
-function getHttpPort(): number {
-  if (!_.isEmpty(process.env.HTTP_PORT)) {
-    return assertEnvVarType('HTTP_PORT', process.env.HTTP_PORT, EnvVarType.Port);
-  }
-  if (!_.isEmpty(process.env.PORT)) {
-    return assertEnvVarType('HTTP_PORT', process.env.PORT, EnvVarType.Port);
-  }
-  return 3000
-}
-
-function getNetworkId(): number {
-  return _.isEmpty(process.env.NETWORK_ID)
-      ? 42
-      : assertEnvVarType('NETWORK_ID', process.env.NETWORK_ID, EnvVarType.NetworkId);
-}
-
-function getFeeRecipient(): string {
-  return _.isEmpty(process.env.FEE_RECIPIENT)
-      ? getDefaultFeeRecipient()
-      : assertEnvVarType('FEE_RECIPIENT', process.env.FEE_RECIPIENT, EnvVarType.FeeRecipient);
-}
-
-function getMakerFeeZrxUnitAmount(): BigNumber {
-  return _.isEmpty(process.env.MAKER_FEE_ZRX_UNIT_AMOUNT)
-      ? new BigNumber(0)
-      : assertEnvVarType('MAKER_FEE_ZRX_UNIT_AMOUNT', process.env.MAKER_FEE_ZRX_UNIT_AMOUNT, EnvVarType.UnitAmount);
-}
-
-function getTakerFeeZrxUnitAmount(): BigNumber {
-  return _.isEmpty(process.env.TAKER_FEE_ZRX_UNIT_AMOUNT)
-      ? new BigNumber(0)
-      : assertEnvVarType('TAKER_FEE_ZRX_UNIT_AMOUNT', process.env.TAKER_FEE_ZRX_UNIT_AMOUNT, EnvVarType.UnitAmount);
-}
-
-function getRpcUrl(): string {
-  return _.isEmpty(process.env.RPC_URL)
-      ? 'https://kovan.infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa'
-      : assertEnvVarType('RPC_URL', process.env.RPC_URL, EnvVarType.Url)
-}
-
-function assertEnvVarType(name: string, value: any, expectedType: EnvVarType): any {
-    let returnValue;
-    switch (expectedType) {
-        case EnvVarType.Port:
-            try {
-                returnValue = parseInt(value, 10);
-                const isWithinRange = returnValue >= 0 && returnValue <= 65535;
-                if (!isWithinRange) {
-                    throw new Error();
-                }
-            } catch (err) {
-                throw new Error(`${name} must be between 0 to 65535, found ${value}.`);
-            }
-            return returnValue;
-        case EnvVarType.NetworkId:
-            try {
-                returnValue = parseInt(value, 10);
-            } catch (err) {
-                throw new Error(`${name} must be a valid integer, found ${value}.`);
-            }
-            return returnValue;
-        case EnvVarType.FeeRecipient:
-            assert.isETHAddressHex(name, value);
-            return value;
-        case EnvVarType.Url:
-            assert.isUri(name, value);
-            return value;
-        case EnvVarType.UnitAmount:
-            try {
-                returnValue = new BigNumber(parseFloat(value));
-                if (returnValue.isNegative) {
-                    throw new Error();
-                }
-            } catch (err) {
-                throw new Error(`${name} must be valid number greater than 0.`);
-            }
-            return returnValue;
-        default:
-            throw new Error(`Unrecognised EnvVarType: ${expectedType} encountered for variable ${name}.`);
+  public includes(value: string): boolean {
+    switch(this.type) {
+      case 'all':
+        return true;
+        break;
+      case 'none':
+        return false;
+        break;
+      case 'except':
+        return this.value ? !this.value.includes(value) : true;
+        break;
+      case 'only':
+        return this.value ? this.value.includes(value) : false;
+        break;
+      default:
+        return false;
+        break;
     }
+  }
 }
-function getDefaultFeeRecipient(): string {
-    let newDefault: string = `0xabcabc${crypto.randomBytes(17).toString('hex')}`
-    if (fs.existsSync(metadataPath)) {
-      const metadata = JSON.parse(fs.readFileSync(metadataPath).toString());
-      const existingDefault: string = metadata.DEFAULT_FEE_RECIPIENT;
-      newDefault = existingDefault || newDefault;
-      if (_.isEmpty(existingDefault)) {
-          const metadataCopy = JSON.parse(JSON.stringify(metadata));
-          metadataCopy.DEFAULT_FEE_RECIPIENT = newDefault;
-          fs.writeFileSync(metadataPath, JSON.stringify(metadataCopy));
-      }
+
+class Config {
+  port: number = 5000;
+  networkId: number = 1;
+  rpcUrl: string = 'https://infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa';
+  feeRecipient: string = '0x0000000000000000000000000000000000000000';
+  makerFee: BigNumber = new BigNumber(0);
+  takerFee: BigNumber = new BigNumber(0);
+  tokens: Listable = new Listable;
+  geos: Listable = new Listable;
+  makers: Listable = new Listable;
+  orderShadowingMarginMs: number = 100 * 1000;
+  permanentCleanupIntervalMs: number = 100 * 1000;
+  maxPerPage: number = 1000;
+  defaultErc20Precision: number = 18;
+
+  constructor(pojo: object) {
+    if (process.env.PORT) {
+      this.port = parseInt(process.env.PORT)
     }
 
-    return newDefault;
+    Object.assign(this, pojo)
+  }
 }
+
+export default new Config(JSON.parse(process.env.CONFIG_STRING_0!));

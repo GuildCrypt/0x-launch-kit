@@ -6,7 +6,7 @@ const cors = require("cors");
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 require("reflect-metadata");
-const config = require("./config");
+const config_1 = require("./config");
 const db_connection_1 = require("./db_connection");
 const handlers_1 = require("./handlers");
 const error_handling_1 = require("./middleware/error_handling");
@@ -20,6 +20,10 @@ const utils_1 = require("./utils");
     app.use(cors());
     app.use(bodyParser.json());
     app.use(url_params_parsing_1.urlParamsParsing);
+    /**
+     * GET config
+     */
+    app.get('/config', asyncHandler(handlers_1.Handlers.config.bind(handlers_1.Handlers)));
     /**
      * GET AssetPairs endpoint retrieves a list of available asset pairs and the information required to trade them.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/getAssetPairs
@@ -56,7 +60,7 @@ const utils_1 = require("./utils");
      */
     app.get('/v2/order/:orderHash', asyncHandler(handlers_1.Handlers.getOrderByHashAsync.bind(handlers_1.Handlers)));
     app.use(error_handling_1.errorHandler);
-    app.listen(config.HTTP_PORT, () => {
-        utils_1.utils.log(`Standard relayer API (HTTP) listening on port ${config.HTTP_PORT}!\nConfig: ${JSON.stringify(config, null, 2)}`);
+    app.listen(config_1.default.port, () => {
+        utils_1.utils.log(`Standard relayer API (HTTP) listening on port ${config_1.default.port}!\nConfig: ${JSON.stringify(config_1.default, null, 2)}`);
     });
 })().catch(utils_1.utils.log);
