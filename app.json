@@ -5,6 +5,7 @@
   "success_url": "/v2/orders",
   "image": "heroku/nodejs",
   "addons": [
+    "openredis",
     {
       "plan": "heroku-postgresql"
     }

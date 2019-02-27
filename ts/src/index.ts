@@ -21,6 +21,8 @@ import { utils } from './utils';
     app.use(bodyParser.json());
     app.use(urlParamsParsing);
 
+    app.get('/', asyncHandler(Handlers.home.bind(Handlers)))
+
     /**
      * GET config
      */
