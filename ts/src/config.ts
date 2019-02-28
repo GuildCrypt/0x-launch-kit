@@ -4,8 +4,8 @@ import * as _ from 'lodash';
 import * as fs from 'fs';
 
 class Listable {
-  type: string = 'none';
-  value?: string[];
+  type: string = 'only';
+  value: string[] = [];
 
   public includes(value: string): boolean {
     switch(this.type) {
@@ -16,10 +16,10 @@ class Listable {
         return false;
         break;
       case 'except':
-        return this.value ? !this.value.includes(value) : true;
+        return !this.value.includes(value);
         break;
       case 'only':
-        return this.value ? this.value.includes(value) : false;
+        return this.value.includes(value);
         break;
       default:
         return false;
@@ -36,7 +36,7 @@ class Config {
   makerFee: BigNumber = new BigNumber(0);
   takerFee: BigNumber = new BigNumber(0);
   tokens: Listable = new Listable;
-  geos: Listable = new Listable;
+  countries: Listable = new Listable;
   orderShadowingMarginMs: number = 100 * 1000;
   permanentCleanupIntervalMs: number = 100 * 1000;
   maxPerPage: number = 1000;

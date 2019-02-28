@@ -86,10 +86,10 @@ class Handlers {
     async postOrderAsync(req, res) {
         utils_1.utils.validateSchema(req.body, json_schemas_1.schemas.signedOrderSchema);
         const signedOrder = unmarshallOrder(req.body);
-        if (config_1.default.geos.type !== 'all') {
+        if (config_1.default.countries.type !== 'all') {
             const ip = req.connection.remoteAddress;
             const iso3166Code = geoip.lookup(ip).country;
-            if (!config_1.default.geos.includes(iso3166Code)) {
+            if (!config_1.default.countries.includes(iso3166Code)) {
                 throw new errors_1.GeoBlockError(iso3166Code);
             }
         }

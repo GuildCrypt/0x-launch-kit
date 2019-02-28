@@ -93,10 +93,10 @@ export class Handlers {
     public async postOrderAsync(req: express.Request, res: express.Response): Promise<void> {
         utils.validateSchema(req.body, schemas.signedOrderSchema);
         const signedOrder = unmarshallOrder(req.body);
-        if (config.geos.type !== 'all') {
+        if (config.countries.type !== 'all') {
           const ip = req.connection.remoteAddress!;
           const iso3166Code = geoip.lookup(ip).country;
-          if (!config.geos.includes(iso3166Code)) {
+          if (!config.countries.includes(iso3166Code)) {
             throw new GeoBlockError(iso3166Code);
           }
         }

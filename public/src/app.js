@@ -26,8 +26,7 @@ app.controller('ConfigController', function ConfigController($scope, $timeout) {
   }).then((configPojo) => {
     $scope.configPojo = configPojo
     listableFields.forEach((field) => {
-      $scope.lsvs[field] = ''
-      $scope.configPojo[field] = { type: 'only' }
+      $scope.lsvs[field] = configPojo[field].value ? configPojo[field].value.join('\r\n') : ''
       $scope.$apply()
     })
   })

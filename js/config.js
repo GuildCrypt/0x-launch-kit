@@ -5,7 +5,8 @@ const _0x_js_1 = require("0x.js");
 const fs = require("fs");
 class Listable {
     constructor() {
-        this.type = 'none';
+        this.type = 'only';
+        this.value = [];
     }
     includes(value) {
         switch (this.type) {
@@ -16,10 +17,10 @@ class Listable {
                 return false;
                 break;
             case 'except':
-                return this.value ? !this.value.includes(value) : true;
+                return !this.value.includes(value);
                 break;
             case 'only':
-                return this.value ? this.value.includes(value) : false;
+                return this.value.includes(value);
                 break;
             default:
                 return false;
@@ -36,7 +37,7 @@ class Config {
         this.makerFee = new _0x_js_1.BigNumber(0);
         this.takerFee = new _0x_js_1.BigNumber(0);
         this.tokens = new Listable;
-        this.geos = new Listable;
+        this.countries = new Listable;
         this.orderShadowingMarginMs = 100 * 1000;
         this.permanentCleanupIntervalMs = 100 * 1000;
         this.maxPerPage = 1000;
