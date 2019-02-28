@@ -27,7 +27,7 @@ const parsePaginationConfig = (req) => {
     return { page, perPage };
 };
 class Handlers {
-    static config(_req, res) {
+    static getConfig(_req, res) {
         res.status(HttpStatus.OK).send(config_1.default);
     }
     static feeRecipients(req, res) {

@@ -2,7 +2,7 @@
   "name": "Bookzaar",
   "website": "https://guildcrypt.com/",
   "repository": "https://github.com/bookzaar",
-  "success_url": "/v2/orders",
+  "success_url": "/",
   "image": "heroku/nodejs",
   "addons": [
     "heroku-redis:hobby-dev",

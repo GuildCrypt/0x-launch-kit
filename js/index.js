@@ -20,45 +20,46 @@ const utils_1 = require("./utils");
     app.use(cors());
     app.use(bodyParser.json());
     app.use(url_params_parsing_1.urlParamsParsing);
+    app.use(express.static('public'));
     /**
      * GET config
      */
-    app.get('/config', asyncHandler(handlers_1.Handlers.config.bind(handlers_1.Handlers)));
+    app.get('/api/bookzaar/v0/config', asyncHandler(handlers_1.Handlers.getConfig.bind(handlers_1.Handlers)));
     /**
      * GET AssetPairs endpoint retrieves a list of available asset pairs and the information required to trade them.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/getAssetPairs
      */
-    app.get('/v2/asset_pairs', asyncHandler(handlers_1.Handlers.assetPairsAsync.bind(handlers_1.Handlers)));
+    app.get('/api/0x/v2/asset_pairs', asyncHandler(handlers_1.Handlers.assetPairsAsync.bind(handlers_1.Handlers)));
     /**
      * GET Orders endpoint retrieves a list of orders given query parameters.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/getOrders
      */
-    app.get('/v2/orders', asyncHandler(handlers.ordersAsync.bind(handlers)));
+    app.get('/api/0x/v2/orders', asyncHandler(handlers.ordersAsync.bind(handlers)));
     /**
      * GET Orderbook endpoint retrieves the orderbook for a given asset pair.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/getOrderbook
      */
-    app.get('/v2/orderbook', asyncHandler(handlers.orderbookAsync.bind(handlers)));
+    app.get('/api/0x/v2/orderbook', asyncHandler(handlers.orderbookAsync.bind(handlers)));
     /**
      * POST Order config endpoint retrives the values for order fields that the relayer requires.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/getOrderConfig
      */
-    app.post('/v2/order_config', handlers_1.Handlers.orderConfig.bind(handlers_1.Handlers));
+    app.post('/api/0x/v2/order_config', handlers_1.Handlers.orderConfig.bind(handlers_1.Handlers));
     /**
      * GET FeeRecepients endpoint retrieves a collection of all fee recipient addresses for a relayer.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/v2/fee_recipients
      */
-    app.get('/v2/fee_recipients', handlers_1.Handlers.feeRecipients.bind(handlers_1.Handlers));
+    app.get('/api/0x//v2/fee_recipients', handlers_1.Handlers.feeRecipients.bind(handlers_1.Handlers));
     /**
      * POST Order endpoint submits an order to the Relayer.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/postOrder
      */
-    app.post('/v2/order', asyncHandler(handlers.postOrderAsync.bind(handlers)));
+    app.post('/api/0x/v2/order', asyncHandler(handlers.postOrderAsync.bind(handlers)));
     /**
      * GET Order endpoint retrieves the order by order hash.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/getOrder
      */
-    app.get('/v2/order/:orderHash', asyncHandler(handlers_1.Handlers.getOrderByHashAsync.bind(handlers_1.Handlers)));
+    app.get('/api/0x/v2/order/:orderHash', asyncHandler(handlers_1.Handlers.getOrderByHashAsync.bind(handlers_1.Handlers)));
     app.use(error_handling_1.errorHandler);
     app.listen(config_1.default.port, () => {
         utils_1.utils.log(`Standard relayer API (HTTP) listening on port ${config_1.default.port}!\nConfig: ${JSON.stringify(config_1.default, null, 2)}`);

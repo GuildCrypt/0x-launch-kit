@@ -1,6 +1,7 @@
 // tslint:disable:custom-no-magic-numbers
 import { BigNumber } from '0x.js';
 import * as _ from 'lodash';
+import * as fs from 'fs'
 
 class Listable {
   type: string = 'none';
@@ -28,6 +29,7 @@ class Listable {
 }
 
 class Config {
+  bookzaarVersion: string = '0.0.0';
   port: number = 5000;
   networkId: number = 1;
   rpcUrl: string = 'https://infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa';
@@ -36,13 +38,13 @@ class Config {
   takerFee: BigNumber = new BigNumber(0);
   tokens: Listable = new Listable;
   geos: Listable = new Listable;
-  makers: Listable = new Listable;
   orderShadowingMarginMs: number = 100 * 1000;
   permanentCleanupIntervalMs: number = 100 * 1000;
   maxPerPage: number = 1000;
   defaultErc20Precision: number = 18;
 
   constructor(pojo: object) {
+    this.bookzaarVersion = JSON.parse(fs.readFileSync(`${__dirname}/../../package.json`, 'utf8')).version
     if (process.env.PORT) {
       this.port = parseInt(process.env.PORT)
     }

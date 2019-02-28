@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:custom-no-magic-numbers
 const _0x_js_1 = require("0x.js");
+const fs = require("fs");
 class Listable {
     constructor() {
         this.type = 'none';
@@ -28,6 +29,7 @@ class Listable {
 }
 class Config {
     constructor(pojo) {
+        this.bookzaarVersion = '0.0.0';
         this.port = 5000;
         this.networkId = 1;
         this.rpcUrl = 'https://infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa';
@@ -41,6 +43,7 @@ class Config {
         this.permanentCleanupIntervalMs = 100 * 1000;
         this.maxPerPage = 1000;
         this.defaultErc20Precision = 18;
+        this.bookzaarVersion = JSON.parse(fs.readFileSync(`${__dirname}/../../package.json`, 'utf8')).version;
         if (process.env.PORT) {
             this.port = parseInt(process.env.PORT);
         }

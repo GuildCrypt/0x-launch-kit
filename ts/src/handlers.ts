@@ -30,7 +30,7 @@ const parsePaginationConfig = (req: express.Request): { page: number; perPage: n
 
 export class Handlers {
     private readonly _orderBook: OrderBook;
-    public static config(_req: express.Request, res: express.Response): void {
+    public static getConfig(_req: express.Request, res: express.Response): void {
         res.status(HttpStatus.OK).send(config);
     }
     public static feeRecipients(req: express.Request, res: express.Response): void {
