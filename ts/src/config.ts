@@ -1,7 +1,7 @@
 // tslint:disable:custom-no-magic-numbers
 import { BigNumber } from '0x.js';
 import * as _ from 'lodash';
-import * as fs from 'fs'
+import * as fs from 'fs';
 
 class Listable {
   type: string = 'none';
@@ -44,7 +44,7 @@ class Config {
   defaultErc20Precision: number = 18;
 
   constructor(pojo: object) {
-    this.bookzaarVersion = JSON.parse(fs.readFileSync(`${__dirname}/../../package.json`, 'utf8')).version
+    this.bookzaarVersion = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version
     if (process.env.PORT) {
       this.port = parseInt(process.env.PORT)
     }

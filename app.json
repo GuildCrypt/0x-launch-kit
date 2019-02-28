@@ -9,5 +9,11 @@
     {
       "plan": "heroku-postgresql"
     }
-  ]
+  ],
+  "env": {
+    "CONFIG_STRING_0": {
+      "description": "JSON Config String",
+      "value": "{}"
+    }
+  }
 }

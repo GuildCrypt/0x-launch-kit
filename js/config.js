@@ -38,12 +38,11 @@ class Config {
         this.takerFee = new _0x_js_1.BigNumber(0);
         this.tokens = new Listable;
         this.geos = new Listable;
-        this.makers = new Listable;
         this.orderShadowingMarginMs = 100 * 1000;
         this.permanentCleanupIntervalMs = 100 * 1000;
         this.maxPerPage = 1000;
         this.defaultErc20Precision = 18;
-        this.bookzaarVersion = JSON.parse(fs.readFileSync(`${__dirname}/../../package.json`, 'utf8')).version;
+        this.bookzaarVersion = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
         if (process.env.PORT) {
             this.port = parseInt(process.env.PORT);
         }
