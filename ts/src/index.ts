@@ -24,6 +24,11 @@ import { utils } from './utils';
     app.use(express.static('public'));
 
     /**
+     * GET version
+     */
+    app.get('/api/bookzaar/v0/version', asyncHandler(Handlers.getVersion.bind(Handlers)))
+
+    /**
      * GET config
      */
     app.get('/api/bookzaar/v0/config', asyncHandler(Handlers.getConfig.bind(Handlers)))

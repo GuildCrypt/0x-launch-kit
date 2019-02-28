@@ -23,6 +23,10 @@ const utils_1 = require("./utils");
     app.use(url_params_parsing_1.urlParamsParsing);
     app.use(express.static('public'));
     /**
+     * GET version
+     */
+    app.get('/api/bookzaar/v0/version', asyncHandler(handlers_1.Handlers.getVersion.bind(handlers_1.Handlers)));
+    /**
      * GET config
      */
     app.get('/api/bookzaar/v0/config', asyncHandler(handlers_1.Handlers.getConfig.bind(handlers_1.Handlers)));

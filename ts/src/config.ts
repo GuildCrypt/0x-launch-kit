@@ -1,7 +1,7 @@
 // tslint:disable:custom-no-magic-numbers
 import { BigNumber } from '0x.js';
 import * as _ from 'lodash';
-import * as fs from 'fs';
+
 
 class Listable {
   type: string = 'only';
@@ -29,7 +29,8 @@ class Listable {
 }
 
 class Config {
-  bookzaarVersion: string = '0.0.0';
+  name?: string;
+  email?: string;
   networkId: number = 1;
   rpcUrl: string = 'https://infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa';
   feeRecipient: string = '0x0000000000000000000000000000000000000000';
@@ -43,9 +44,7 @@ class Config {
   defaultErc20Precision: number = 18;
 
   constructor(pojo: object) {
-    this.bookzaarVersion = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version
-
-    Object.assign(this, pojo)
+      Object.assign(this, pojo)
   }
 }
 

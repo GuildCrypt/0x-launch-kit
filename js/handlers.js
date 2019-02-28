@@ -6,6 +6,7 @@ const web3_wrapper_1 = require("@0x/web3-wrapper");
 const HttpStatus = require("http-status-codes");
 const _ = require("lodash");
 const geoip = require("geoip-lite");
+const fs = require("fs");
 const config_1 = require("./config");
 const constants_1 = require("./constants");
 const errors_1 = require("./errors");
@@ -27,6 +28,10 @@ const parsePaginationConfig = (req) => {
     return { page, perPage };
 };
 class Handlers {
+    static getVersion(_req, res) {
+        const version = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
+        res.status(HttpStatus.OK).send({ version });
+    }
     static getConfig(_req, res) {
         res.status(HttpStatus.OK).send(config_1.default);
     }

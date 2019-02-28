@@ -21,9 +21,18 @@ app.controller('ConfigController', function ConfigController($scope, $timeout) {
     ? `https://dashboard.heroku.com/apps/${hostname.split('.')[0]}/settings`
     : 'https://dashboard.heroku.com/apps/'
 
+  fetch('/api/bookzaar/v0/version').then((response) => {
+    return response.json()
+  }).then((pojo) => {
+    console.log(pojo)
+    $scope.bookzaarVersion = pojo.version
+    $scope.$apply()
+  })
+
   fetch('/api/bookzaar/v0/config').then((response) => {
     return response.json()
   }).then((configPojo) => {
+    console.log(configPojo)
     $scope.configPojo = configPojo
     listableFields.forEach((field) => {
       $scope.lsvs[field] = configPojo[field].value ? configPojo[field].value.join('\r\n') : ''

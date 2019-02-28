@@ -11,42 +11,63 @@
       textarea, input {
         font-family: monospace;
       }
+      p {
+        margin-top: 10px;
+      }
     </style>
   </head>
   <body ng-app="app">
     <div class="container" ng-controller="ConfigController">
       <div ng-show="configPojo" class="ng-hide">
-        <h1>Bookzaar v{{configPojo.bookzaarVersion}}</h1>
+        <h1>DEX-in-a-Box v{{bookzaarVersion}}</h1>
         <form ng-submit="generateConfigString()">
           <table class="table">
+            <tr>
+              <td>DEX Name</td>
+              <td>
+                <input type="text" class="form-control" required ng-model="configPojo.name" min="0" step="1">
+                <p>The <b>DEX Name</b> is the name that users will see in interfaces. It does not have any effect.</p>
+              </td>
+            </tr>
+            <tr>
+              <td>Email</td>
+              <td>
+                <input type="email" class="form-control" required ng-model="configPojo.email" min="0" step="1">
+              </td>
+            </tr>
             <tr>
               <td>Network Id</td>
               <td>
                 <input type="number" class="form-control" required ng-model="configPojo.networkId" min="0" step="1">
+                <p>The <b>Network Id</b> refers to which Ethereum network you want to run on. 1 = Mainnet, 3 = Ropsten, 4 = Rinkeby, 42 = Kovan.</p>
               </td>
             </tr>
             <tr>
               <td>RPC Url</td>
               <td>
                 <input class="form-control" required ng-model="configPojo.rpcUrl">
+                <p>The <b>RPC Url</b> is the url of the Ethereum node you'd like to connect to. You can run your own, or connect to a cloud hosted <a>Infura</a> instance.</p>
               </td>
             </tr>
             <tr>
               <td>Fee Recipient</td>
               <td>
                 <input class="form-control" required ng-model="configPojo.feeRecipient">
+                <p>The <b>Fee Recipient</b> is Ethereum address of whoever will receive fees.</p>
               </td>
             </tr>
             <tr>
               <td>Maker Fee (ZRX)</td>
               <td>
                 <input type="number" class="form-control" required ng-model="makerFee" min="0" step="1">
+                <p>The <b>Maker Fee</b> is the amount of ZRX a Maker will have to pay to list their orders on this DEX.</p>
               </td>
             </tr>
             <tr>
               <td>Taker Fee (ZRX)</td>
               <td>
                 <input type="number" class="form-control" required ng-model="takerFee" min="0" step="1">
+                <p>The <b>Taker Fee</b> is the amount of ZRX a Taker will have to pay to execute an order listed on this DEX.</p>
               </td>
             </tr>
             <tr>

@@ -4,7 +4,8 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import * as express from 'express';
 import * as HttpStatus from 'http-status-codes';
 import * as _ from 'lodash';
-import * as geoip from 'geoip-lite'
+import * as geoip from 'geoip-lite';
+import * as fs from 'fs';
 
 import config from './config'
 import { DEFAULT_PAGE, DEFAULT_PER_PAGE, NULL_ADDRESS, ZRX_DECIMALS } from './constants';
@@ -30,6 +31,10 @@ const parsePaginationConfig = (req: express.Request): { page: number; perPage: n
 
 export class Handlers {
     private readonly _orderBook: OrderBook;
+    public static getVersion(_req: express.Request, res: express.Response): void {
+        const version = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
+        res.status(HttpStatus.OK).send({ version });
+    }
     public static getConfig(_req: express.Request, res: express.Response): void {
         res.status(HttpStatus.OK).send(config);
     }
