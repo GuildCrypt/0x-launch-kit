@@ -6,6 +6,7 @@ import * as asyncHandler from 'express-async-handler';
 import 'reflect-metadata';
 
 import config from './config';
+import port from './port'
 import { initDBConnectionAsync } from './db_connection';
 import { Handlers } from './handlers';
 import { errorHandler } from './middleware/error_handling';
@@ -65,9 +66,9 @@ import { utils } from './utils';
 
     app.use(errorHandler);
 
-    app.listen(config.port, () => {
+    app.listen(port, () => {
         utils.log(
-            `Standard relayer API (HTTP) listening on port ${config.port}!\nConfig: ${JSON.stringify(
+            `Standard relayer API (HTTP) listening on port ${port}!\nConfig: ${JSON.stringify(
                 config,
                 null,
                 2,

@@ -30,7 +30,6 @@ class Listable {
 
 class Config {
   bookzaarVersion: string = '0.0.0';
-  port: number = 5000;
   networkId: number = 1;
   rpcUrl: string = 'https://infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa';
   feeRecipient: string = '0x0000000000000000000000000000000000000000';
@@ -45,9 +44,6 @@ class Config {
 
   constructor(pojo: object) {
     this.bookzaarVersion = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version
-    if (process.env.PORT) {
-      this.port = parseInt(process.env.PORT)
-    }
 
     Object.assign(this, pojo)
   }

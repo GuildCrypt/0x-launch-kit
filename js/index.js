@@ -7,6 +7,7 @@ const express = require("express");
 const asyncHandler = require("express-async-handler");
 require("reflect-metadata");
 const config_1 = require("./config");
+const port_1 = require("./port");
 const db_connection_1 = require("./db_connection");
 const handlers_1 = require("./handlers");
 const error_handling_1 = require("./middleware/error_handling");
@@ -61,7 +62,7 @@ const utils_1 = require("./utils");
      */
     app.get('/api/0x/v2/order/:orderHash', asyncHandler(handlers_1.Handlers.getOrderByHashAsync.bind(handlers_1.Handlers)));
     app.use(error_handling_1.errorHandler);
-    app.listen(config_1.default.port, () => {
-        utils_1.utils.log(`Standard relayer API (HTTP) listening on port ${config_1.default.port}!\nConfig: ${JSON.stringify(config_1.default, null, 2)}`);
+    app.listen(port_1.default, () => {
+        utils_1.utils.log(`Standard relayer API (HTTP) listening on port ${port_1.default}!\nConfig: ${JSON.stringify(config_1.default, null, 2)}`);
     });
 })().catch(utils_1.utils.log);

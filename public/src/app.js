@@ -17,7 +17,7 @@ const $configString = document.getElementById('config-string')
 app.controller('ConfigController', function ConfigController($scope, $timeout) {
 
   const hostname = document.location.hostname
-  $scope.settingsUrl = hostname.includes('.heroku.com')
+  $scope.settingsUrl = hostname.includes('.herokuapp.com')
     ? `https://dashboard.heroku.com/apps/${hostname.split('.')[0]}/settings`
     : 'https://dashboard.heroku.com/apps/'
 

@@ -12,7 +12,7 @@
   ],
   "env": {
     "CONFIG_STRING_0": {
-      "description": "JSON Config String",
+      "description": "JSON Config String. We suggest you keep this as `{}` for now.",
       "value": "{}"
     }
   }

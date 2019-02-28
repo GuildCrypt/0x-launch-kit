@@ -30,7 +30,6 @@ class Listable {
 class Config {
     constructor(pojo) {
         this.bookzaarVersion = '0.0.0';
-        this.port = 5000;
         this.networkId = 1;
         this.rpcUrl = 'https://infura.io/v3/e2c067d9717e492091d1f1d7a2ec55aa';
         this.feeRecipient = '0x0000000000000000000000000000000000000000';
@@ -43,9 +42,6 @@ class Config {
         this.maxPerPage = 1000;
         this.defaultErc20Precision = 18;
         this.bookzaarVersion = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
-        if (process.env.PORT) {
-            this.port = parseInt(process.env.PORT);
-        }
         Object.assign(this, pojo);
     }
 }
