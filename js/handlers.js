@@ -7,6 +7,9 @@ const HttpStatus = require("http-status-codes");
 const _ = require("lodash");
 const geoip = require("geoip-lite");
 const fs = require("fs");
+let Blot = require('biglistoftokens');
+let Amorph = require('amorph');
+let amorphHex = require('amorph-hex');
 const config_1 = require("./config");
 const constants_1 = require("./constants");
 const errors_1 = require("./errors");
@@ -34,6 +37,15 @@ class Handlers {
     }
     static getConfig(_req, res) {
         res.status(HttpStatus.OK).send(config_1.default);
+    }
+    static getAsset(req, res) {
+        const address = Amorph.from(amorphHex.prefixed, req.params.address);
+        const blot = new Blot(config_1.default.networkId, address);
+        blot.getForkDeltaTokenbase().fetchInfo().then((info) => {
+            res.status(HttpStatus.OK).send(info);
+        }).catch((err) => {
+            console.log(err);
+        });
     }
     static feeRecipients(req, res) {
         const { page, perPage } = parsePaginationConfig(req);

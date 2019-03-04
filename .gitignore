@@ -70,3 +70,6 @@ ts/lib
 database.sqlite
 
 TODO.txt
+
+# libs
+public/lib

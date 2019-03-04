@@ -1,0 +1,10 @@
+<div class="orders">
+  <table class="table">
+    <tr>
+      <th>Price ({{baseAssetSymbol}}/{{quoteAssetSymbol}})</th>
+      <th>Size ({{makerAssetSymbol}})</th>
+      <td><button class="btn btn-xs btn-dark" ng-click="add()">Add</button></td>
+    </tr>
+    <tbody ng-repeat="order in orders" order="order"></tbody>
+  </table>
+</div>

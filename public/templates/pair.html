@@ -1,0 +1,23 @@
+<div class="container pair">
+  <ul class="nav nav-tabs pair-nav">
+    <li class="nav-item">
+      <a class="nav-link {{bos === 'buy' ? 'active' : ''}}"  ng-click="bos = 'buy'">Buy {{baseAssetSymbol}} with {{quoteAssetSymbol}}</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {{bos === 'sell' ? 'active' : ''}}" ng-click="bos = 'sell'">Sell {{baseAssetSymbol}} for {{quoteAssetSymbol}}</a>
+    </li>
+  </ul>
+  <div class="row">
+    <div class="col-sm-12 col-md-6">
+      <div asset="baseAsset" asset-label="{{bos === 'buy' ? 'Buy' : 'Sell'}}"></div>
+      <div asset="quoteAsset" asset-label="{{bos === 'buy' ? 'With' : 'For'}}"></div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+      <div orders
+        orders-base-asset="baseAsset"
+        orders-quote-asset="quoteAsset"
+        orders-boa="bos === 'buy' ? 'ask' : 'bid'"
+      ></div>
+    </div>
+  </div>
+</div>

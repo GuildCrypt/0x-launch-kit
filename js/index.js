@@ -31,6 +31,14 @@ const utils_1 = require("./utils");
      */
     app.get('/api/bookzaar/v0/config', asyncHandler(handlers_1.Handlers.getConfig.bind(handlers_1.Handlers)));
     /**
+     * GET version
+     */
+    app.get('/api/bookzaar/v0/assets/:address', asyncHandler(handlers_1.Handlers.getAsset.bind(handlers_1.Handlers)));
+    /**
+     * GET token
+     */
+    app.get('/api/bookzaar/v0/config', asyncHandler(handlers_1.Handlers.getConfig.bind(handlers_1.Handlers)));
+    /**
      * GET AssetPairs endpoint retrieves a list of available asset pairs and the information required to trade them.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/getAssetPairs
      */

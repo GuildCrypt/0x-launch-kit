@@ -7,6 +7,10 @@ import * as _ from 'lodash';
 import * as geoip from 'geoip-lite';
 import * as fs from 'fs';
 
+let Blot: any = require('biglistoftokens');
+let Amorph: any = require('amorph');
+let amorphHex: any = require('amorph-hex');
+
 import config from './config'
 import { DEFAULT_PAGE, DEFAULT_PER_PAGE, NULL_ADDRESS, ZRX_DECIMALS } from './constants';
 import { NotFoundError, ValidationError, ValidationErrorCodes, GeoBlockError } from './errors';
@@ -37,6 +41,15 @@ export class Handlers {
     }
     public static getConfig(_req: express.Request, res: express.Response): void {
         res.status(HttpStatus.OK).send(config);
+    }
+    public static getAsset(req: express.Request, res: express.Response): void {
+        const address = Amorph.from(amorphHex.prefixed, req.params.address);
+        const blot = new Blot(config.networkId, address);
+        blot.getForkDeltaTokenbase().fetchInfo().then((info: object) => {
+          res.status(HttpStatus.OK).send(info);
+        }).catch((err: Error) => {
+          console.log(err)
+        });
     }
     public static feeRecipients(req: express.Request, res: express.Response): void {
         const { page, perPage } = parsePaginationConfig(req);

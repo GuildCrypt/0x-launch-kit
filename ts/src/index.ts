@@ -34,6 +34,16 @@ import { utils } from './utils';
     app.get('/api/bookzaar/v0/config', asyncHandler(Handlers.getConfig.bind(Handlers)))
 
     /**
+     * GET version
+     */
+    app.get('/api/bookzaar/v0/assets/:address', asyncHandler(Handlers.getAsset.bind(Handlers)))
+
+    /**
+     * GET token
+     */
+    app.get('/api/bookzaar/v0/config', asyncHandler(Handlers.getConfig.bind(Handlers)))
+
+    /**
      * GET AssetPairs endpoint retrieves a list of available asset pairs and the information required to trade them.
      * http://sra-spec.s3-website-us-east-1.amazonaws.com/#operation/getAssetPairs
      */
