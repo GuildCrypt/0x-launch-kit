@@ -1,0 +1,5 @@
+rm -rf public/lib/
+mkdir -p public/lib/
+cp node_modules/0x.js/lib/index.js public/lib/ZeroEx.js
+browserify node_modules/@0x/connect --standalone ZeroExConnect > public/lib/ZeroExConnect.js
+browserify node_modules/navigo --standalone Navigo > public/lib/Navigo.js

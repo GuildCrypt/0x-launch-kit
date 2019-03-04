@@ -7,11 +7,12 @@
     "license": "Apache-2.0",
     "scripts": {
         "prettier": "yarn prettier:js && yarn prettier:ts",
-        "build": "yarn build:ts && shx rm -rf js && shx cp -r ts/lib/ js",
+        "build": "yarn build:ts && shx rm -rf js && shx cp -r ts/lib/ js && yarn build:frontend",
         "prettier:js": "prettier --write 'js/**/*.js' --config .prettierrc",
         "start:js": "node -r dotenv/config.js js/index.js",
         "build:ts": "tsc -p ts/tsconfig.json",
         "watch:ts": "tsc -w -p ts/tsconfig.json",
+        "build:frontend": "sh ./bin/build-frontend",
         "prettier:ts": "prettier --write 'ts/**/*.ts' --config .prettierrc",
         "start:ts": "node -r dotenv/config ts/lib/index.js",
         "lint:ts": "tslint --project ts --format stylish",
