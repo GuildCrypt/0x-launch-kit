@@ -4,6 +4,6 @@
       <span class="badge badge-secondary asset-label" ng-show="label">{{label}}</span>
       {{assetTitle}}
     </h5>
-    <p class="card-text">{{assetInfo.description}}</p>
+    <p class="card-text"><a ng-href="https://etherscan.io/address/{{assetInfo.address}}" target="_blank">{{assetInfo.address}}</a></p>
   </div>
 </div>

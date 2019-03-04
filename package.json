@@ -45,7 +45,7 @@
         "@types/geoip-lite": "^1.1.29",
         "amorph": "^4.2.0",
         "amorph-hex": "^3.0.1",
-        "biglistoftokens": "^0.0.0",
+        "biglistoftokens": "^1.0.1",
         "bluebird": "^3.5.3",
         "body-parser": "^1.18.3",
         "cors": "^2.8.5",

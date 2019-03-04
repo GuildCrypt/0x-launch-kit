@@ -41,7 +41,7 @@ class Handlers {
     static getAsset(req, res) {
         const address = Amorph.from(amorphHex.prefixed, req.params.address);
         const blot = new Blot(config_1.default.networkId, address);
-        blot.getForkDeltaTokenbase().fetchInfo().then((info) => {
+        blot.getMewel().fetchInfo().then((info) => {
             res.status(HttpStatus.OK).send(info);
         }).catch((err) => {
             console.log(err);
